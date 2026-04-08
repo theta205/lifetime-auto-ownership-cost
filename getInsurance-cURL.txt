@@ -1,0 +1,17 @@
+curl 'https://content-api.insurance.bankrate.com/quadrant/rateTable' \
+  -H 'accept: application/json, text/plain, */*' \
+  -H 'accept-language: en-US,en;q=0.9' \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/json' \
+  -H 'origin: https://www.bankrate.com' \
+  -H 'pragma: no-cache' \
+  -H 'priority: u=1, i' \
+  -H 'referer: https://www.bankrate.com/' \
+  -H 'sec-ch-ua: "Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"' \
+  -H 'sec-ch-ua-mobile: ?1' \
+  -H 'sec-ch-ua-platform: "iOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-site' \
+  -H 'user-agent: Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1' \
+  --data-raw '{"args":{"policy":{"pd":"50,000","med":"None","term":12,"umbi":"100/300","liability":"100/300","occupancy":"Owner","residence":"House","credit_tier":"Good","e_signature":"Yes","payment_type":"Installments","number_drivers":1,"number_vehicles":1,"property_market":100000,"property_policy":"Home","residence_years":5,"incident_date_mode":0,"last_late_pay_time":"No Late Payment","paperless_discount":"Yes","naic_current_carrier":99999,"number_late_payments":0,"days_advance_purchase":0,"electronic_fund_transfer":"Yes","naic_current_carrier_mths":60},"drivers":[{"age":40,"sex":"Female","degree":"Bachelors","dlapse":0,"filing":"None","status":"Single","ca_license":"24y00m","occupation":"Employed","profession":"Other","us_license":"24y00m","good_student":"No","relationship":"Insured","with_parents":"No","license_state":"OR","student_level":"None","license_status":"Active","prior_physical":"24y00m","distant_student":"No","driver_training":"No","miles_from_home":0,"prior_liability":"24y00m","defensive_driver":"No","number_incidents":0,"license_suspended":"No","continuous_license":"24y00m","verifiable_license":"24y00m","prior_carrier_market":200000,"prior_carrier_months":60,"prior_liability_type":"Standard","dprior_liability_limit":"100/300","driver_occupation_years":10}],"vehicles":[{"use":"Work","vin":"4T1H31AK.N","coll":"500","comp":"500","make":"Toyota","model":"Camry","annual":13000,"parked":"Garage","rental":"None","towing":"None","commute":10,"zipcode":"87001","ownership":"Financed","days_per_week":5,"model_year_y2k":"2022","purchase_status":"New"}],"geo":{"state":"FL","zipcode":"32306"}}}'

@@ -161,6 +161,13 @@ export function calculate(inputs: CarInputs): CalculationResult {
 }
 
 export const DEFAULT_INPUTS: CarInputs = {
+  make: "",
+  model: "",
+  year: new Date().getFullYear(),
+  state: "",
+  zipCode: "",
+  driverAge: 35,
+  driverSex: "Male",
   purchasePrice: 30000,
   downPayment: 5000,
   salesTaxRate: 7.5,

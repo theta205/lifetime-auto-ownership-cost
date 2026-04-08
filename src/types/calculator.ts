@@ -1,4 +1,15 @@
 export interface CarInputs {
+  // Vehicle identity
+  make: string;
+  model: string;
+  year: number;
+
+  // Driver & location (drives insurance fetch + tax auto-fill)
+  state: string;       // 2-letter code, e.g. "FL"
+  zipCode: string;
+  driverAge: number;
+  driverSex: "Male" | "Female";
+
   // Purchase
   purchasePrice: number;
   downPayment: number;

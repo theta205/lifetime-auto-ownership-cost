@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { CarCostForm } from "./CarCostForm";
 import { CostChart } from "./CostChart";
 import { SummaryCards } from "./SummaryCards";
@@ -10,6 +10,7 @@ import { CarInputs } from "@/types/calculator";
 
 type ChartView = "cumulative" | "annual" | "value";
 type Tab = "chart" | "table";
+type InsuranceStatus = "idle" | "loading" | "fetched" | "error";
 
 const CHART_VIEWS: { key: ChartView; label: string }[] = [
   { key: "cumulative", label: "Cumulative" },
@@ -21,8 +22,53 @@ export function CarCostCalculator() {
   const [inputs, setInputs] = useState<CarInputs>(DEFAULT_INPUTS);
   const [chartView, setChartView] = useState<ChartView>("cumulative");
   const [tab, setTab] = useState<Tab>("chart");
+  const [insuranceStatus, setInsuranceStatus] = useState<InsuranceStatus>("idle");
+  const insuranceController = useRef<AbortController | null>(null);
 
   const result = useMemo(() => calculate(inputs), [inputs]);
+
+  // Fetch insurance when all required fields are present
+  useEffect(() => {
+    const { make, model, year, state, zipCode, driverAge, driverSex, milesPerYear } = inputs;
+    if (!make || !model || !year || !state || zipCode.length !== 5 || !driverAge) return;
+
+
+    insuranceController.current?.abort();
+    insuranceController.current = new AbortController();
+    setInsuranceStatus("loading");
+
+    const params = new URLSearchParams({
+      age:       String(driverAge),
+      sex:       driverSex,
+      state,
+      zipCode,
+      makeSlug:  make,
+      modelSlug: model,
+      miles:     String(milesPerYear),
+    });
+
+    fetch(`/api/insurance?${params}`, { signal: insuranceController.current.signal })
+      .then((r) => r.json())
+      .then((data: { median?: number; avg?: number; error?: string }) => {
+        if (data.error || (!data.median && !data.avg)) {
+          setInsuranceStatus("error");
+        } else {
+          const annual = data.median ?? data.avg ?? 0;
+          setInputs((prev) => ({ ...prev, annualInsurancePremium: annual }));
+          setInsuranceStatus("fetched");
+        }
+      })
+      .catch((err) => {
+        if (err.name !== "AbortError") setInsuranceStatus("error");
+      });
+
+    return () => insuranceController.current?.abort();
+  }, [ // eslint-disable-line react-hooks/exhaustive-deps
+    inputs.make, inputs.model, inputs.year,
+    inputs.state, inputs.zipCode,
+    inputs.driverAge, inputs.driverSex,
+    inputs.milesPerYear,
+  ]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -39,7 +85,7 @@ export function CarCostCalculator() {
           {/* Inputs panel */}
           <aside className="w-full shrink-0 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm lg:w-72 xl:w-80">
             <h2 className="mb-4 text-base font-semibold text-gray-800">Inputs</h2>
-            <CarCostForm inputs={inputs} onChange={setInputs} />
+            <CarCostForm inputs={inputs} onChange={setInputs} insuranceStatus={insuranceStatus} />
           </aside>
 
           {/* Results panel */}
