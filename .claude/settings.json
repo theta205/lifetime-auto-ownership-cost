@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git)",
+      "Read(//tmp/**)",
+      "Bash(npx create-next-app@latest auto-cost-app --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git)",
+      "Bash(cp -r /tmp/auto-cost-app/. /home/isaiah-rohrer/coding-projects/lifetime-auto-ownership-cost/)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001)"
+    ],
+    "additionalDirectories": [
+      "/home/isaiah-rohrer/coding-projects/lifetime-auto-ownership-cost"
+    ]
+  }
+}
