@@ -24,6 +24,7 @@ export function CarCostCalculator() {
   const [tab, setTab] = useState<Tab>("chart");
   const [insuranceStatus, setInsuranceStatus] = useState<InsuranceStatus>("idle");
   const insuranceController = useRef<AbortController | null>(null);
+  const depreciationController = useRef<AbortController | null>(null);
 
   const result = useMemo(() => calculate(inputs), [inputs]);
 
@@ -45,6 +46,7 @@ export function CarCostCalculator() {
       makeSlug:  make,
       modelSlug: model,
       miles:     String(milesPerYear),
+      year:      String(year),
     });
 
     fetch(`/api/insurance?${params}`, { signal: insuranceController.current.signal })
@@ -68,6 +70,48 @@ export function CarCostCalculator() {
     inputs.state, inputs.zipCode,
     inputs.driverAge, inputs.driverSex,
     inputs.milesPerYear,
+  ]);
+
+  // Fetch CarEdge depreciation curve when make + model + price are set
+  useEffect(() => {
+    const { make, model, purchasePrice, milesPerYear } = inputs;
+    if (!make || !model || !purchasePrice) return;
+
+    depreciationController.current?.abort();
+    depreciationController.current = new AbortController();
+
+    const params = new URLSearchParams({
+      make,
+      model,
+      price: String(purchasePrice),
+      miles: String(milesPerYear),
+    });
+
+    fetch(`/api/depreciation?${params}`, { signal: depreciationController.current.signal })
+      .then((r) => r.json())
+      .then((data: { residuals?: number[]; error?: string }) => {
+        if (data.residuals && data.residuals.length > 0) {
+          const raw = data.residuals;
+          // Offset into the curve based on how old the car is at purchase.
+          // CarEdge residuals are indexed from new (raw[0] = after year 1 from factory).
+          const ageAtPurchase = Math.max(0, new Date().getFullYear() - inputs.year);
+          const base = ageAtPurchase === 0 ? 1 : (raw[ageAtPurchase - 1] ?? raw[raw.length - 1]);
+          const adjusted = raw.slice(ageAtPurchase).map((r) => r / base);
+          setInputs((prev) => ({ ...prev, depreciation: adjusted.length > 0 ? adjusted : undefined }));
+        } else {
+          // CarEdge has no data for this vehicle — clear any previous curve
+          setInputs((prev) => ({ ...prev, depreciation: undefined }));
+        }
+      })
+      .catch((err) => {
+        if (err.name !== "AbortError") {
+          setInputs((prev) => ({ ...prev, depreciation: undefined }));
+        }
+      });
+
+    return () => depreciationController.current?.abort();
+  }, [ // eslint-disable-line react-hooks/exhaustive-deps
+    inputs.make, inputs.model, inputs.year, inputs.purchasePrice, inputs.milesPerYear,
   ]);
 
   return (
@@ -129,7 +173,7 @@ export function CarCostCalculator() {
               </div>
 
               {tab === "chart" ? (
-                <CostChart years={result.years} view={chartView} />
+                <CostChart years={result.years} view={chartView} purchasePrice={inputs.purchasePrice} />
               ) : (
                 <YearlyTable years={result.years} />
               )}

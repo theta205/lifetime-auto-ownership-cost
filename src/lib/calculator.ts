@@ -75,27 +75,35 @@ export function calculate(inputs: CarInputs): CalculationResult {
     fuelPricePerGallon,
     annualInsurancePremium,
     depreciationModel,
+    depreciation,
     baseMaintenance,
     ownershipYears,
   } = inputs;
 
-  const loanAmount = Math.max(0, purchasePrice - downPayment);
+  const safePurchasePrice = Math.max(0, purchasePrice);
+  const safeDownPayment = Math.min(Math.max(0, downPayment), safePurchasePrice);
+  const loanAmount = safePurchasePrice - safeDownPayment;
   const payment = loanAmount > 0 ? monthlyPayment(loanAmount, loanInterestRate, loanTermMonths) : 0;
   const loanPaidOffYear = Math.ceil(loanTermMonths / 12);
-  const annualFuel = (milesPerYear / fuelMpg) * fuelPricePerGallon;
-  const salesTaxAmount = purchasePrice * (salesTaxRate / 100);
+  const annualFuel = fuelMpg > 0 ? (milesPerYear / fuelMpg) * fuelPricePerGallon : 0;
+  const salesTaxAmount = safePurchasePrice * (salesTaxRate / 100);
 
   const years: YearlyCost[] = [];
-  let vehicleValue = purchasePrice;
+  let vehicleValue = safePurchasePrice;
   let cumulativeTotal = 0;
 
   // Year 0 up-front costs: down payment + tax + fees (not included in yearly loop)
-  const upfrontCosts = downPayment + salesTaxAmount + registrationFees;
+  const upfrontCosts = safeDownPayment + salesTaxAmount + registrationFees;
 
   for (let year = 1; year <= ownershipYears; year++) {
-    // Depreciation
-    const rate = depreciationRateForYear(depreciationModel, year);
-    vehicleValue = vehicleValue * (1 - rate);
+    // Depreciation: use CarEdge residual fractions for years 1–10 when available,
+    // then continue with standard compounding rates for years beyond the data.
+    if (depreciation && year <= depreciation.length) {
+      vehicleValue = safePurchasePrice * depreciation[year - 1];
+    } else {
+      const rate = depreciationRateForYear(depreciationModel, year);
+      vehicleValue = vehicleValue * (1 - rate);
+    }
 
     // Loan
     const { principal, interest } = loanPaymentsForYear(loanAmount, loanInterestRate, loanTermMonths, year);
@@ -112,7 +120,7 @@ export function calculate(inputs: CarInputs): CalculationResult {
     cumulativeTotal += totalThisYear;
 
     // Net cost = cumulative total + down payment - current residual value
-    const netCost = cumulativeTotal + downPayment - vehicleValue;
+    const netCost = cumulativeTotal + safeDownPayment - vehicleValue;
 
     years.push({
       year,
@@ -145,7 +153,7 @@ export function calculate(inputs: CarInputs): CalculationResult {
   return {
     years,
     summary: {
-      totalPrincipal: totals.principal + downPayment,
+      totalPrincipal: totals.principal + safeDownPayment,
       totalInterest: totals.interest,
       totalTaxAndFees: totals.taxAndFees,
       totalFuel: totals.fuel,

@@ -4,6 +4,7 @@ import { CarInputs } from "@/types/calculator";
 import { InputField } from "./InputField";
 import { VehicleSelector } from "./VehicleSelector";
 import { US_STATES, STATE_TAX_RATES } from "@/lib/stateTax";
+import { MAKE_MAINTENANCE, DEFAULT_MAINTENANCE } from "@/lib/maintenanceCosts";
 
 interface CarCostFormProps {
   inputs: CarInputs;
@@ -41,7 +42,7 @@ export function CarCostForm({ inputs, onChange, insuranceStatus }: CarCostFormPr
           make={inputs.make}
           model={inputs.model}
           year={inputs.year}
-          onMakeChange={(make) => onChange({ ...inputs, make, model: "" })}
+          onMakeChange={(make) => onChange({ ...inputs, make, model: "", baseMaintenance: MAKE_MAINTENANCE[make] ?? DEFAULT_MAINTENANCE })}
           onModelChange={(model) => onChange({ ...inputs, model })}
           onYearChange={(year) => onChange({ ...inputs, year })}
           onMpgFetched={(mpg) => onChange({ ...inputs, fuelMpg: mpg })}
@@ -142,12 +143,11 @@ export function CarCostForm({ inputs, onChange, insuranceStatus }: CarCostFormPr
         </div>
       </section>
 
-      {/* Depreciation & Maintenance */}
+      {/* Depreciation */}
       <section>
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">Depreciation & Maintenance</h3>
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">Depreciation</h3>
         <div className="grid grid-cols-2 gap-3">
-          <InputField label="Depreciation Model"    name="depreciationModel" value={inputs.depreciationModel} onChange={handle} type="select" options={DEPRECIATION_OPTIONS} />
-          <InputField label="Base Annual Maintenance" name="baseMaintenance" value={inputs.baseMaintenance}   onChange={handle} prefix="$" suffix="/yr" min={0} step={50} />
+          <InputField label="Depreciation Model" name="depreciationModel" value={inputs.depreciationModel} onChange={handle} type="select" options={DEPRECIATION_OPTIONS} />
         </div>
       </section>
 

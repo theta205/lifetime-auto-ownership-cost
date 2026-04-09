@@ -17,6 +17,7 @@ import { YearlyCost } from "@/types/calculator";
 interface CostChartProps {
   years: YearlyCost[];
   view: "cumulative" | "annual" | "value";
+  purchasePrice?: number;
 }
 
 const fmt = (v: number) =>
@@ -49,11 +50,15 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-export function CostChart({ years, view }: CostChartProps) {
+export function CostChart({ years, view, purchasePrice }: CostChartProps) {
   if (view === "value") {
+    const valueData = [
+      { year: 0, vehicleValue: purchasePrice ?? years[0]?.vehicleValue ?? 0, cumulativeTotal: 0, netCost: 0 },
+      ...years,
+    ];
     return (
       <ResponsiveContainer width="100%" height={320}>
-        <LineChart data={years} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+        <LineChart data={valueData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
           <XAxis dataKey="year" label={{ value: "Year", position: "insideBottom", offset: -2 }} tick={{ fontSize: 12 }} />
           <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 12 }} />
@@ -68,15 +73,18 @@ export function CostChart({ years, view }: CostChartProps) {
   }
 
   if (view === "cumulative") {
-    const data = years.map((y) => ({
-      year: y.year,
-      Principal: y.principal,
-      Interest: y.interest,
-      "Tax & Fees": y.tax + y.registration,
-      Fuel: y.fuel,
-      Insurance: y.insurance,
-      Maintenance: y.maintenance,
-    }));
+    const data = [
+      { year: 0, Principal: 0, Interest: 0, "Tax & Fees": 0, Fuel: 0, Insurance: 0, Maintenance: 0 },
+      ...years.map((y) => ({
+        year: y.year,
+        Principal: y.principal,
+        Interest: y.interest,
+        "Tax & Fees": y.tax + y.registration,
+        Fuel: y.fuel,
+        Insurance: y.insurance,
+        Maintenance: y.maintenance,
+      })),
+    ];
 
     // Convert to cumulative stacks
     const cumData = data.map((_, i) => {
@@ -108,15 +116,17 @@ export function CostChart({ years, view }: CostChartProps) {
   }
 
   // Annual view
-  const data = years.map((y) => ({
-    year: y.year,
-    Principal: y.principal,
-    Interest: y.interest,
-    "Tax & Fees": y.tax + y.registration,
-    Fuel: y.fuel,
-    Insurance: y.insurance,
-    Maintenance: y.maintenance,
-  }));
+  const data = [
+    ...years.map((y) => ({
+      year: y.year,
+      Principal: y.principal,
+      Interest: y.interest,
+      "Tax & Fees": y.tax + y.registration,
+      Fuel: y.fuel,
+      Insurance: y.insurance,
+      Maintenance: y.maintenance,
+    })),
+  ];
 
   return (
     <ResponsiveContainer width="100%" height={320}>

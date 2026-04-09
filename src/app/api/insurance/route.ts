@@ -1,25 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCategoryForVehicle, CATEGORY_SAMPLE } from "@/lib/vehicleCategories";
 
-export async function GET(req: NextRequest) {
-  const p = req.nextUrl.searchParams;
-  const age      = p.get("age");
-  const sex      = p.get("sex");
-  const state    = p.get("state");
-  const zipCode  = p.get("zipCode");
-  const makeSlug = p.get("makeSlug");
-  const modelSlug= p.get("modelSlug");
-  const miles    = p.get("miles");
+// VIN position 10 encodes model year
+const VIN_YEAR_CHARS: Record<number, string> = {
+  2020: "L", 2021: "M", 2022: "N", 2023: "P",
+  2024: "R", 2025: "S", 2026: "T", 2027: "V",
+};
 
-  if (!age || !sex || !state || !zipCode || !makeSlug || !modelSlug || !miles) {
-    return NextResponse.json({ error: "Missing required params" }, { status: 400 });
-  }
+type CarrierRate = { carrier: string; low: number; high: number; available: boolean };
 
-  // Map user's vehicle to the closest Bankrate sample vehicle
-  const category = getCategoryForVehicle(makeSlug, modelSlug);
-  const sample = CATEGORY_SAMPLE[category];
+async function fetchRates(body: object): Promise<CarrierRate[]> {
+  const res = await fetch("https://content-api.insurance.bankrate.com/quadrant/rateTable", {
+    method: "POST",
+    headers: {
+      "accept": "application/json, text/plain, */*",
+      "accept-language": "en-US,en;q=0.9",
+      "cache-control": "no-cache",
+      "content-type": "application/json",
+      "origin": "https://www.bankrate.com",
+      "pragma": "no-cache",
+      "referer": "https://www.bankrate.com/",
+      "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`Bankrate returned ${res.status}`);
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
+}
 
-  const body = {
+function buildBody(
+  rateYear: number,
+  sample: { make: string; model: string; vin: string },
+  { age, sex, state, zipCode, miles }: { age: string; sex: string; state: string; zipCode: string; miles: string }
+) {
+  const yearChar = VIN_YEAR_CHARS[rateYear] ?? VIN_YEAR_CHARS[2023];
+  const vin = sample.vin.replace(".", yearChar);
+  return {
     args: {
       policy: {
         pd: "50,000",
@@ -84,7 +101,7 @@ export async function GET(req: NextRequest) {
       vehicles: [
         {
           use: "Work",
-          vin: "4T1H31AK.N",
+          vin,
           coll: "500",
           comp: "500",
           make: sample.make,
@@ -97,73 +114,68 @@ export async function GET(req: NextRequest) {
           zipcode: zipCode,
           ownership: "Financed",
           days_per_week: 5,
-          model_year_y2k: String(sample.year),
+          model_year_y2k: String(rateYear),
           purchase_status: "New",
         },
       ],
       geo: { state, zipcode: zipCode },
     },
   };
+}
 
-  console.log(`[insurance] category="${category}" sample="${sample.make} ${sample.model} ${sample.year}" state=${state} zip=${zipCode} age=${age} sex=${sex}`);
-  console.log("[insurance] Request body:", JSON.stringify(body, null, 2));
+export async function GET(req: NextRequest) {
+  const p = req.nextUrl.searchParams;
+  const age       = p.get("age");
+  const sex       = p.get("sex");
+  const state     = p.get("state");
+  const zipCode   = p.get("zipCode");
+  const makeSlug  = p.get("makeSlug");
+  const modelSlug = p.get("modelSlug");
+  const miles     = p.get("miles");
+  const yearStr   = p.get("year");
+
+  if (!age || !sex || !state || !zipCode || !makeSlug || !modelSlug || !miles) {
+    return NextResponse.json({ error: "Missing required params" }, { status: 400 });
+  }
+
+  const category = getCategoryForVehicle(makeSlug, modelSlug);
+  const sample = CATEGORY_SAMPLE[category];
+  const selectedYear = yearStr ? parseInt(yearStr) : sample.year;
+
+  const driverInfo = { age, sex, state, zipCode, miles };
+
+  console.log(`[insurance] category="${category}" sample="${sample.make} ${sample.model}" year=${selectedYear} state=${state} zip=${zipCode}`);
 
   try {
-    const res = await fetch("https://content-api.insurance.bankrate.com/quadrant/rateTable", {
-      method: "POST",
-      headers: {
-        "accept": "application/json, text/plain, */*",
-        "accept-language": "en-US,en;q=0.9",
-        "cache-control": "no-cache",
-        "content-type": "application/json",
-        "origin": "https://www.bankrate.com",
-        "pragma": "no-cache",
-        "referer": "https://www.bankrate.com/",
-        "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1",
-      },
-      body: JSON.stringify(body),
-    });
+    // Try the user's selected year first; if Bankrate has no data for it
+    // (e.g. future model year or discontinued vehicle), fall back to sample.year
+    let rates = await fetchRates(buildBody(selectedYear, sample, driverInfo));
+    let available = rates.filter((r) => r.available && typeof r.low === "number" && typeof r.high === "number");
 
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("Bankrate error:", res.status, text);
-      return NextResponse.json({ error: `API returned ${res.status}` }, { status: 502 });
+    if (available.length === 0 && selectedYear !== sample.year) {
+      console.log(`[insurance] No carriers for year=${selectedYear}, retrying with sample year=${sample.year}`);
+      rates = await fetchRates(buildBody(sample.year, sample, driverInfo));
+      available = rates.filter((r) => r.available && typeof r.low === "number" && typeof r.high === "number");
     }
 
-    const data = await res.json();
-
-    console.log("[insurance] Bankrate response keys:", Object.keys(data));
-    console.log("[insurance] Bankrate response (truncated):", JSON.stringify(data).slice(0, 1000));
-
-    const annuals: number[] = [];
-    const dig = (obj: unknown, path = "") => {
-      if (!obj || typeof obj !== "object") return;
-      if (Array.isArray(obj)) { obj.forEach((v, i) => dig(v, `${path}[${i}]`)); return; }
-      const o = obj as Record<string, unknown>;
-      for (const key of ["annual", "annualPremium", "annual_premium", "totalAnnual", "total_annual"]) {
-        if (typeof o[key] === "number" && (o[key] as number) > 200) {
-          console.log(`[insurance] Found rate at ${path}.${key} =`, o[key]);
-          annuals.push(o[key] as number);
-        }
-      }
-      Object.entries(o).forEach(([k, v]) => dig(v, `${path}.${k}`));
-    };
-    dig(data);
-
-    if (annuals.length === 0) {
-      console.error("[insurance] No rates found. Full response:", JSON.stringify(data, null, 2));
-      return NextResponse.json({ error: "No rates in response", raw: data }, { status: 404 });
+    if (available.length === 0) {
+      console.error("[insurance] No available carriers:", JSON.stringify(rates).slice(0, 500));
+      return NextResponse.json({ error: "No available carriers for this state/zip" }, { status: 404 });
     }
 
-    annuals.sort((a, b) => a - b);
-    const median = annuals[Math.floor(annuals.length / 2)];
-    const avg    = Math.round(annuals.reduce((s, v) => s + v, 0) / annuals.length);
+    const midpoints = available.map((r) => Math.round((r.low + r.high) / 2));
+    midpoints.sort((a, b) => a - b);
+    const median = midpoints[Math.floor(midpoints.length / 2)];
+    const avg    = Math.round(midpoints.reduce((s, v) => s + v, 0) / midpoints.length);
+
+    console.log(`[insurance] ${available.length} carriers:`, available.map((r) => `${r.carrier} $${r.low}-$${r.high}`));
 
     return NextResponse.json({
       median, avg,
-      low:      annuals[0],
-      high:     annuals[annuals.length - 1],
-      count:    annuals.length,
+      low:      available[0].low,
+      high:     available[available.length - 1].high,
+      count:    available.length,
+      carriers: available.map((r) => ({ carrier: r.carrier, low: r.low, high: r.high })),
       category,
       sample:   `${sample.make} ${sample.model}`,
     });

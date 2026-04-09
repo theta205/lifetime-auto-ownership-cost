@@ -47,7 +47,8 @@ export function VehicleSelector({
     setMpgLoading(true);
     setMpgError(null);
 
-    const params = new URLSearchParams({ year: String(year), make: selectedMake?.displayName ?? make, model });
+    const modelDisplay = selectedMake?.models.find((m) => m.slug === model)?.displayName ?? model;
+    const params = new URLSearchParams({ year: String(year), make: selectedMake?.displayName ?? make, model: modelDisplay });
     fetch(`/api/mpg?${params}`, { signal: controller.signal })
       .then((r) => r.json())
       .then((data: MpgResult & { error?: string }) => {

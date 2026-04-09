@@ -14,26 +14,26 @@ export type VehicleCategory =
   | "hybrid";
 
 /** Bankrate sample vehicle per category (as used in their methodology) */
-export const CATEGORY_SAMPLE: Record<VehicleCategory, { make: string; model: string; year: number }> = {
-  "small-suv":    { make: "Toyota",    model: "RAV4",     year: 2023 },
-  "midsize-suv":  { make: "Honda",     model: "Pilot",    year: 2023 },
-  "large-suv":    { make: "Buick",     model: "Enclave",  year: 2023 },
-  "small-sedan":  { make: "Honda",     model: "Civic",    year: 2023 },
-  "midsize-sedan":{ make: "Toyota",    model: "Camry",    year: 2023 },
-  "large-sedan":  { make: "Dodge",     model: "Charger",  year: 2023 },
-  "pickup":       { make: "Ford",      model: "F-150",    year: 2023 },
-  "minivan":      { make: "Toyota",    model: "Sienna",   year: 2023 },
-  "sports":       { make: "Chevrolet", model: "Corvette Stingray", year: 2023 },
-  "luxury-suv":   { make: "Acura",     model: "RDX",      year: 2023 },
-  "luxury-sedan": { make: "BMW",       model: "330i",     year: 2023 },
-  "ev":           { make: "Chevrolet", model: "Bolt EUV", year: 2023 },
-  "hybrid":       { make: "Toyota",    model: "Prius",    year: 2023 },
+export const CATEGORY_SAMPLE: Record<VehicleCategory, { make: string; model: string; year: number; vin: string }> = {
+  "small-suv":    { make: "Toyota",    model: "RAV4",     year: 2023, vin: "2T3P1RFV.P" },
+  "midsize-suv":  { make: "Honda",     model: "Pilot",    year: 2023, vin: "5FNYF8H5.P" },
+  "large-suv":    { make: "Buick",     model: "Enclave",  year: 2023, vin: "5GAEVAKW.P" },
+  "small-sedan":  { make: "Honda",     model: "Civic",    year: 2023, vin: "2HGFE2F5.P" },
+  "midsize-sedan":{ make: "Toyota",    model: "Camry",    year: 2023, vin: "4T1H31AK.P" },
+  "large-sedan":  { make: "Dodge",     model: "Charger",  year: 2023, vin: "2C3CDXBG.P" },
+  "pickup":       { make: "Ford",      model: "F-150",    year: 2023, vin: "1FTFW1E5.P" },
+  "minivan":      { make: "Toyota",    model: "Sienna",   year: 2023, vin: "5TDBRKEC.P" },
+  "sports":       { make: "Chevrolet", model: "Corvette Stingray", year: 2023, vin: "1G1YB2D4.P" },
+  "luxury-suv":   { make: "Acura",     model: "RDX",      year: 2023, vin: "5J8TC2H5.P" },
+  "luxury-sedan": { make: "BMW",       model: "330i",     year: 2023, vin: "3MW5R7J0.P" },
+  "ev":           { make: "Chevrolet", model: "Bolt EUV", year: 2023, vin: "1G1FX6S0.P" },
+  "hybrid":       { make: "Toyota",    model: "Prius",    year: 2023, vin: "JTDKAMFU.P" },
 };
 
 /** Maps "makeSlug/modelSlug" → VehicleCategory */
 export const VEHICLE_CATEGORY_MAP: Record<string, VehicleCategory> = {
   // Acura
-  "acura/integra":       "small-sedan",
+  "acura/integra":       "luxury-sedan",
   "acura/mdx":           "luxury-suv",
   "acura/rdx":           "luxury-suv",
   "acura/tlx":           "luxury-sedan",
@@ -50,18 +50,18 @@ export const VEHICLE_CATEGORY_MAP: Record<string, VehicleCategory> = {
   "aston-martin/vantage":"sports",
 
   // Audi
-  "audi/a3":             "small-sedan",
-  "audi/a4":             "midsize-sedan",
-  "audi/a4 allroad":     "midsize-sedan",
+  "audi/a3":             "luxury-sedan",
+  "audi/a4":             "luxury-sedan",
+  "audi/a4 allroad":     "luxury-sedan",
   "audi/a5 cabriolet":   "sports",
   "audi/a5 coupe":       "sports",
-  "audi/a5 sportback":   "midsize-sedan",
+  "audi/a5 sportback":   "luxury-sedan",
   "audi/a6":             "luxury-sedan",
   "audi/a6 allroad":     "luxury-sedan",
   "audi/a7 sportback":   "luxury-sedan",
   "audi/a8":             "luxury-sedan",
   "audi/e-tron gt":      "ev",
-  "audi/q3":             "small-suv",
+  "audi/q3":             "luxury-suv",
   "audi/q4 e-tron":      "ev",
   "audi/q5":             "luxury-suv",
   "audi/q7":             "large-suv",
@@ -97,8 +97,8 @@ export const VEHICLE_CATEGORY_MAP: Record<string, VehicleCategory> = {
   "bmw/m3":        "sports",
   "bmw/m4":        "sports",
   "bmw/m5":        "sports",
-  "bmw/x1":        "small-suv",
-  "bmw/x2":        "small-suv",
+  "bmw/x1":        "luxury-suv",
+  "bmw/x2":        "luxury-suv",
   "bmw/x3":        "luxury-suv",
   "bmw/x4":        "luxury-suv",
   "bmw/x5":        "luxury-suv",

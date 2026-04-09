@@ -30,6 +30,9 @@ export interface CarInputs {
 
   // Depreciation
   depreciationModel: "standard" | "fast" | "slow";
+  // CarEdge residual fractions for years 1–10 (index 0 = end of year 1).
+  // When present, these override the model-based rates for those years.
+  depreciation?: number[];
 
   // Maintenance (base annual cost; increases with age)
   baseMaintenance: number;

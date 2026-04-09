@@ -1,95 +1,23 @@
-GET /api/insurance?age=35&sex=Male&state=FL&zipCode=32304&makeSlug=acura&modelSlug=integra&miles=12000 404 in 2768ms
-[insurance] category="small-sedan" sample="Honda Civic 2023" state=DE zip=32304 age=35 sex=Male
-[insurance] Request body: {
-  "args": {
-    "policy": {
-      "pd": "50,000",
-      "med": "None",
-      "term": 12,
-      "umbi": "100/300",
-      "liability": "100/300",
-      "occupancy": "Owner",
-      "residence": "House",
-      "credit_tier": "Good",
-      "e_signature": "Yes",
-      "payment_type": "Installments",
-      "number_drivers": 1,
-      "number_vehicles": 1,
-      "property_market": 100000,
-      "property_policy": "Home",
-      "residence_years": 5,
-      "incident_date_mode": 0,
-      "last_late_pay_time": "No Late Payment",
-      "paperless_discount": "Yes",
-      "naic_current_carrier": 99999,
-      "number_late_payments": 0,
-      "days_advance_purchase": 0,
-      "electronic_fund_transfer": "Yes",
-      "naic_current_carrier_mths": 60
-    },
-    "drivers": [
-      {
-        "age": 35,
-        "sex": "Male",
-        "degree": "Bachelors",
-        "dlapse": 0,
-        "filing": "None",
-        "status": "Single",
-        "ca_license": "24y00m",
-        "occupation": "Employed",
-        "profession": "Other",
-        "us_license": "24y00m",
-        "good_student": "No",
-        "relationship": "Insured",
-        "with_parents": "No",
-        "license_state": "DE",
-        "student_level": "None",
-        "license_status": "Active",
-        "prior_physical": "24y00m",
-        "distant_student": "No",
-        "driver_training": "No",
-        "miles_from_home": 0,
-        "prior_liability": "24y00m",
-        "defensive_driver": "No",
-        "number_incidents": 0,
-        "license_suspended": "No",
-        "continuous_license": "24y00m",
-        "verifiable_license": "24y00m",
-        "prior_carrier_market": 200000,
-        "prior_carrier_months": 60,
-        "prior_liability_type": "Standard",
-        "dprior_liability_limit": "100/300",
-        "driver_occupation_years": 10
-      }
-    ],
-    "vehicles": [
-      {
-        "use": "Work",
-        "vin": "4T1H31AK.N",
-        "coll": "500",
-        "comp": "500",
-        "make": "Honda",
-        "model": "Civic",
-        "annual": 12000,
-        "parked": "Garage",
-        "rental": "None",
-        "towing": "None",
-        "commute": 10,
-        "zipcode": "32304",
-        "ownership": "Financed",
-        "days_per_week": 5,
-        "model_year_y2k": "2023",
-        "purchase_status": "New"
-      }
-    ],
-    "geo": {
-      "state": "DE",
-      "zipcode": "32304"
-    }
-  }
-}
-Bankrate error: 500 {"ErrorInfo":{"Code":6,"Message":"Failed to get rates. Unable to validate quote. Invalid zipcode 32304"}}
- GET /api/insurance?age=35&sex=Male&state=DE&zipCode=32304&makeSlug=acura&modelSlug=integra&miles=12000 502 in 946ms
+isaiah-rohrer@isaiah-rohrer-pc:~/coding-projects/lifetime-auto-ownership-cost$ npm run dev
+
+> auto-cost-app@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 1309ms
+ ○ Compiling / ...
+ ✓ Compiled / in 4s (1476 modules)
+ GET / 200 in 4392ms
+ ✓ Compiled in 307ms (729 modules)
+ ✓ Compiled /favicon.ico in 235ms (770 modules)
+ GET /favicon.ico 200 in 311ms
+ ✓ Compiled /api/mpg in 123ms (795 modules)
+ GET /api/mpg?year=2026&make=Acura&model=integra 200 in 189ms
+ ✓ Compiled /api/insurance in 175ms (798 modules)
 [insurance] category="small-sedan" sample="Honda Civic 2023" state=FL zip=32304 age=35 sex=Male
 [insurance] Request body: {
   "args": {
@@ -181,130 +109,665 @@ Bankrate error: 500 {"ErrorInfo":{"Code":6,"Message":"Failed to get rates. Unabl
 }
 [insurance] Bankrate response keys: [ '0', '1', '2', '3' ]
 [insurance] Bankrate response (truncated): [{"carrier":"Allstate","low":3610,"high":4332,"available":true,"brScore":3.9,"jdScore":"691/1000","logo":"https://cdn.insurance.redventures.io/images/allstate.svg","url":"/insurance/reviews/allstate/","expertTake":"Allstate's multiple savings opportunities and high J.D. Power claims satisfaction score may make it an attractive choice for drivers who want affordable, reliable coverage. Additional coverage options are limited, but the carrier does offer rental reimbursement.","pros":["Multiple reward options, such as Deductible Rewards and Drivewise, for driving safely, though availability may vary by state laws","Strong mobile and online tools for easy claims and policy support","Driving training program available tailored for teens to reduce accident risk"],"cons":["Scored below average in a majority of regions based on J.D. Power’s 2022 U.S. Auto Insurance Study","Few additional coverage options","Some policy and coverage options may be limited by state availability"],"details":"Allst
-[insurance] No rates found. Full response: [
-  {
-    "carrier": "Allstate",
-    "low": 3610,
-    "high": 4332,
-    "available": true,
-    "brScore": 3.9,
-    "jdScore": "691/1000",
-    "logo": "https://cdn.insurance.redventures.io/images/allstate.svg",
-    "url": "/insurance/reviews/allstate/",
-    "expertTake": "Allstate's multiple savings opportunities and high J.D. Power claims satisfaction score may make it an attractive choice for drivers who want affordable, reliable coverage. Additional coverage options are limited, but the carrier does offer rental reimbursement.",
-    "pros": [
-      "Multiple reward options, such as Deductible Rewards and Drivewise, for driving safely, though availability may vary by state laws",
-      "Strong mobile and online tools for easy claims and policy support",
-      "Driving training program available tailored for teens to reduce accident risk"
+[insurance] 4 carriers, 2 available: [ 'Allstate $3610-$4332', 'Geico $2368-$2841.6' ]
+ GET /api/insurance?age=35&sex=Male&state=FL&zipCode=32304&makeSlug=acura&modelSlug=integra&miles=12000 200 in 3062ms
+[insurance] category="small-sedan" sample="Honda Civic 2023" state=FL zip=32304 age=35 sex=Female
+[insurance] Request body: {
+  "args": {
+    "policy": {
+      "pd": "50,000",
+      "med": "None",
+      "term": 12,
+      "umbi": "100/300",
+      "liability": "100/300",
+      "occupancy": "Owner",
+      "residence": "House",
+      "credit_tier": "Good",
+      "e_signature": "Yes",
+      "payment_type": "Installments",
+      "number_drivers": 1,
+      "number_vehicles": 1,
+      "property_market": 100000,
+      "property_policy": "Home",
+      "residence_years": 5,
+      "incident_date_mode": 0,
+      "last_late_pay_time": "No Late Payment",
+      "paperless_discount": "Yes",
+      "naic_current_carrier": 99999,
+      "number_late_payments": 0,
+      "days_advance_purchase": 0,
+      "electronic_fund_transfer": "Yes",
+      "naic_current_carrier_mths": 60
+    },
+    "drivers": [
+      {
+        "age": 35,
+        "sex": "Female",
+        "degree": "Bachelors",
+        "dlapse": 0,
+        "filing": "None",
+        "status": "Single",
+        "ca_license": "24y00m",
+        "occupation": "Employed",
+        "profession": "Other",
+        "us_license": "24y00m",
+        "good_student": "No",
+        "relationship": "Insured",
+        "with_parents": "No",
+        "license_state": "FL",
+        "student_level": "None",
+        "license_status": "Active",
+        "prior_physical": "24y00m",
+        "distant_student": "No",
+        "driver_training": "No",
+        "miles_from_home": 0,
+        "prior_liability": "24y00m",
+        "defensive_driver": "No",
+        "number_incidents": 0,
+        "license_suspended": "No",
+        "continuous_license": "24y00m",
+        "verifiable_license": "24y00m",
+        "prior_carrier_market": 200000,
+        "prior_carrier_months": 60,
+        "prior_liability_type": "Standard",
+        "dprior_liability_limit": "100/300",
+        "driver_occupation_years": 10
+      }
     ],
-    "cons": [
-      "Scored below average in a majority of regions based on J.D. Power’s 2022 U.S. Auto Insurance Study",
-      "Few additional coverage options",
-      "Some policy and coverage options may be limited by state availability"
+    "vehicles": [
+      {
+        "use": "Work",
+        "vin": "4T1H31AK.N",
+        "coll": "500",
+        "comp": "500",
+        "make": "Honda",
+        "model": "Civic",
+        "annual": 12000,
+        "parked": "Garage",
+        "rental": "None",
+        "towing": "None",
+        "commute": 10,
+        "zipcode": "32304",
+        "ownership": "Financed",
+        "days_per_week": 5,
+        "model_year_y2k": "2023",
+        "purchase_status": "New"
+      }
     ],
-    "details": "Allstate has well-rated digital tools for online policy management. The Drivewise telematics program could help safe drivers save money, and the company advertises a discount of up to 25 percent for bundling home and auto coverage. ",
-    "standoutFeatures": [
-      "Pay-per-mile coverage available",
-      "Over 10 advertised discounts",
-      "24/7 claims filing and tracking"
-    ],
-    "getStarted": "",
-    "availability": "",
-    "superlative": "",
-    "bankrate_award": ""
-  },
-  {
-    "carrier": "Farmers",
-    "low": 3394,
-    "high": 4072.7999999999997,
-    "available": false,
-    "brScore": 3.8,
-    "jdScore": "706/1000",
-    "logo": "https://cdn.insurance.redventures.io/images/farmers.svg",
-    "url": "/insurance/reviews/farmers/",
-    "expertTake": "Farmers has tens of thousands of insurance agents located in offices nationwide, which is perfect for drivers who prefer in-person insurance counseling. While Farmers does not have 24/7 customer service, they do have lower-than-average customer complaints.",
-    "pros": [
-      "Robust coverage options offered that may not be available with other carriers",
-      "Tens of thousands of agents located across the country",
-      "Fewer-than-average customer complaints regarding private passenger auto, according to the National Association of Insurance Commissioners (NAIC)"
-    ],
-    "cons": [
-      "Low customer satisfaction per J.D. Power scores",
-      "Lower-than-average J.D. Power digital service score",
-      "Customer service is not available 24/7"
-    ],
-    "details": "Farmers is one of the largest auto insurance carriers in the country with nearly 50,000 agents available for personalized service. ",
-    "standoutFeatures": [
-      "Robust add-on options, including spare parts insurance and windshield coverage",
-      "Shared family car discount",
-      "Good payer discount (no late payments for 12 months)"
-    ],
-    "getStarted": "",
-    "availability": "",
-    "superlative": "",
-    "bankrate_award": ""
-  },
-  {
-    "carrier": "Geico",
-    "low": 2368,
-    "high": 2841.6,
-    "available": true,
-    "brScore": 4.3,
-    "jdScore": "692/1000",
-    "logo": "https://cdn.insurance.redventures.io/images/geico.svg",
-    "url": "/insurance/reviews/geico/",
-    "expertTake": "With low average premiums for high-risk drivers, Geico may appeal to those with an at-fault accident. Geico rates also tend to be lower, with an adequate mix of coverage options, discounts and digital tools available. However, Geico has limited local agencies, so in-person support may be lacking. ",
-    "pros": [
-      "Average rates are lower than the national average",
-      "Average rates for drivers with an at-fault accident or moving violation on their record may be more affordable than competitors",
-      "Robust digital tools for online policy management"
-    ],
-    "cons": [
-      "May have limited local agencies for those who want in-person support",
-      "Fewer optional coverage add-ons than competitors",
-      "Mobile app is highly-rated in the app store, but the company scored below the segment average for service in the J.D. Power U.S. Insurance Digital Experience Study"
-    ],
-    "details": "Geico has some of the best digital tools in the industry and a long list of discounts. Endorsement options aren't as robust as some competitors, and gap insurance is not available.",
-    "standoutFeatures": [
-      "Affiliation and military discounts",
-      "Coverage may be available for high-risk drivers",
-      "Few local agents"
-    ],
-    "getStarted": "",
-    "availability": "",
-    "superlative": "Best overall",
-    "bankrate_award": "BEST AUTO INSURANCE FOR HIGH-RISK DRIVERS"
-  },
-  {
-    "carrier": "State Farm",
-    "low": 1910,
-    "high": 2292,
-    "available": false,
-    "brScore": 4.3,
-    "jdScore": "710/1000",
-    "logo": "https://cdn.insurance.redventures.io/images/statefarm.svg",
-    "url": "/insurance/reviews/state-farm/",
-    "expertTake": "As the largest insurer in the country by market share, State Farm customers have a myriad of resources at their fingertips from a strong network of local agents to money-saving home and auto packages. Auto policies have a long list of discounts, but drivers looking to bundle may factor that homeowner policies tend to have more limited savings opportunities. ",
-    "pros": [
-      "Numerous discounts available, including a telematics program and savings aimed toward young drivers",
-      "Highly-rated mobile app for hands-on policy management",
-      "Plenty of agencies located across the country"
-    ],
-    "cons": [
-      "Gap insurance is not available",
-      "Cannot purchase accident forgiveness",
-      "No live chat"
-    ],
-    "details": "State Farm is a well-known national auto insurer with a wide network of local agents. It offers many insurance and banking products.\n",
-    "standoutFeatures": [
-      "2025 Bankrate Award Winner for Best Auto Insurance Company for Safe Drivers",
-      "Mobile app available for payments, claims and roadside assistance",
-      "Bundling discount available"
-    ],
-    "getStarted": "",
-    "availability": "",
-    "superlative": "Best for local agencies",
-    "bankrate_award": "BEST FOR SAFE DRIVERS"
+    "geo": {
+      "state": "FL",
+      "zipcode": "32304"
+    }
   }
-]
- GET /api/insurance?age=35&sex=Male&state=FL&zipCode=32304&makeSlug=acura&modelSlug=integra&miles=12000 404 in 2622ms
+}
+[insurance] Bankrate response keys: [ '0', '1', '2', '3' ]
+[insurance] Bankrate response (truncated): [{"carrier":"Allstate","low":3623,"high":4347.599999999999,"available":true,"brScore":3.9,"jdScore":"691/1000","logo":"https://cdn.insurance.redventures.io/images/allstate.svg","url":"/insurance/reviews/allstate/","expertTake":"Allstate's multiple savings opportunities and high J.D. Power claims satisfaction score may make it an attractive choice for drivers who want affordable, reliable coverage. Additional coverage options are limited, but the carrier does offer rental reimbursement.","pros":["Multiple reward options, such as Deductible Rewards and Drivewise, for driving safely, though availability may vary by state laws","Strong mobile and online tools for easy claims and policy support","Driving training program available tailored for teens to reduce accident risk"],"cons":["Scored below average in a majority of regions based on J.D. Power’s 2022 U.S. Auto Insurance Study","Few additional coverage options","Some policy and coverage options may be limited by state availability"],"de
+[insurance] 4 carriers, 2 available: [ 'Allstate $3623-$4347.599999999999', 'Geico $2476-$2971.2' ]
+ GET /api/insurance?age=35&sex=Female&state=FL&zipCode=32304&makeSlug=acura&modelSlug=integra&miles=12000 200 in 3484ms
+[insurance] category="luxury-sedan" sample="BMW 330i 2023" state=FL zip=32304 age=35 sex=Female
+[insurance] Request body: {
+  "args": {
+    "policy": {
+      "pd": "50,000",
+      "med": "None",
+      "term": 12,
+      "umbi": "100/300",
+      "liability": "100/300",
+      "occupancy": "Owner",
+      "residence": "House",
+      "credit_tier": "Good",
+      "e_signature": "Yes",
+      "payment_type": "Installments",
+      "number_drivers": 1,
+      "number_vehicles": 1,
+      "property_market": 100000,
+      "property_policy": "Home",
+      "residence_years": 5,
+      "incident_date_mode": 0,
+      "last_late_pay_time": "No Late Payment",
+      "paperless_discount": "Yes",
+      "naic_current_carrier": 99999,
+      "number_late_payments": 0,
+      "days_advance_purchase": 0,
+      "electronic_fund_transfer": "Yes",
+      "naic_current_carrier_mths": 60
+    },
+    "drivers": [
+      {
+        "age": 35,
+        "sex": "Female",
+        "degree": "Bachelors",
+        "dlapse": 0,
+        "filing": "None",
+        "status": "Single",
+        "ca_license": "24y00m",
+        "occupation": "Employed",
+        "profession": "Other",
+        "us_license": "24y00m",
+        "good_student": "No",
+        "relationship": "Insured",
+        "with_parents": "No",
+        "license_state": "FL",
+        "student_level": "None",
+        "license_status": "Active",
+        "prior_physical": "24y00m",
+        "distant_student": "No",
+        "driver_training": "No",
+        "miles_from_home": 0,
+        "prior_liability": "24y00m",
+        "defensive_driver": "No",
+        "number_incidents": 0,
+        "license_suspended": "No",
+        "continuous_license": "24y00m",
+        "verifiable_license": "24y00m",
+        "prior_carrier_market": 200000,
+        "prior_carrier_months": 60,
+        "prior_liability_type": "Standard",
+        "dprior_liability_limit": "100/300",
+        "driver_occupation_years": 10
+      }
+    ],
+    "vehicles": [
+      {
+        "use": "Work",
+        "vin": "4T1H31AK.N",
+        "coll": "500",
+        "comp": "500",
+        "make": "BMW",
+        "model": "330i",
+        "annual": 12000,
+        "parked": "Garage",
+        "rental": "None",
+        "towing": "None",
+        "commute": 10,
+        "zipcode": "32304",
+        "ownership": "Financed",
+        "days_per_week": 5,
+        "model_year_y2k": "2023",
+        "purchase_status": "New"
+      }
+    ],
+    "geo": {
+      "state": "FL",
+      "zipcode": "32304"
+    }
+  }
+}
+ GET /api/mpg?year=2026&make=Genesis&model=g70 404 in 460ms
+[insurance] Bankrate response keys: [ '0', '1', '2', '3' ]
+[insurance] Bankrate response (truncated): [{"carrier":"Allstate","low":3623,"high":4347.599999999999,"available":true,"brScore":3.9,"jdScore":"691/1000","logo":"https://cdn.insurance.redventures.io/images/allstate.svg","url":"/insurance/reviews/allstate/","expertTake":"Allstate's multiple savings opportunities and high J.D. Power claims satisfaction score may make it an attractive choice for drivers who want affordable, reliable coverage. Additional coverage options are limited, but the carrier does offer rental reimbursement.","pros":["Multiple reward options, such as Deductible Rewards and Drivewise, for driving safely, though availability may vary by state laws","Strong mobile and online tools for easy claims and policy support","Driving training program available tailored for teens to reduce accident risk"],"cons":["Scored below average in a majority of regions based on J.D. Power’s 2022 U.S. Auto Insurance Study","Few additional coverage options","Some policy and coverage options may be limited by state availability"],"de
+[insurance] 4 carriers, 2 available: [ 'Allstate $3623-$4347.599999999999', 'Geico $2476-$2971.2' ]
+ GET /api/insurance?age=35&sex=Female&state=FL&zipCode=32304&makeSlug=genesis&modelSlug=g70&miles=12000 200 in 3094ms
+[insurance] category="midsize-sedan" sample="Toyota Camry 2023" state=FL zip=32304 age=35 sex=Female
+[insurance] Request body: {
+  "args": {
+    "policy": {
+      "pd": "50,000",
+      "med": "None",
+      "term": 12,
+      "umbi": "100/300",
+      "liability": "100/300",
+      "occupancy": "Owner",
+      "residence": "House",
+      "credit_tier": "Good",
+      "e_signature": "Yes",
+      "payment_type": "Installments",
+      "number_drivers": 1,
+      "number_vehicles": 1,
+      "property_market": 100000,
+      "property_policy": "Home",
+      "residence_years": 5,
+      "incident_date_mode": 0,
+      "last_late_pay_time": "No Late Payment",
+      "paperless_discount": "Yes",
+      "naic_current_carrier": 99999,
+      "number_late_payments": 0,
+      "days_advance_purchase": 0,
+      "electronic_fund_transfer": "Yes",
+      "naic_current_carrier_mths": 60
+    },
+    "drivers": [
+      {
+        "age": 35,
+        "sex": "Female",
+        "degree": "Bachelors",
+        "dlapse": 0,
+        "filing": "None",
+        "status": "Single",
+        "ca_license": "24y00m",
+        "occupation": "Employed",
+        "profession": "Other",
+        "us_license": "24y00m",
+        "good_student": "No",
+        "relationship": "Insured",
+        "with_parents": "No",
+        "license_state": "FL",
+        "student_level": "None",
+        "license_status": "Active",
+        "prior_physical": "24y00m",
+        "distant_student": "No",
+        "driver_training": "No",
+        "miles_from_home": 0,
+        "prior_liability": "24y00m",
+        "defensive_driver": "No",
+        "number_incidents": 0,
+        "license_suspended": "No",
+        "continuous_license": "24y00m",
+        "verifiable_license": "24y00m",
+        "prior_carrier_market": 200000,
+        "prior_carrier_months": 60,
+        "prior_liability_type": "Standard",
+        "dprior_liability_limit": "100/300",
+        "driver_occupation_years": 10
+      }
+    ],
+    "vehicles": [
+      {
+        "use": "Work",
+        "vin": "4T1H31AK.N",
+        "coll": "500",
+        "comp": "500",
+        "make": "Toyota",
+        "model": "Camry",
+        "annual": 12000,
+        "parked": "Garage",
+        "rental": "None",
+        "towing": "None",
+        "commute": 10,
+        "zipcode": "32304",
+        "ownership": "Financed",
+        "days_per_week": 5,
+        "model_year_y2k": "2023",
+        "purchase_status": "New"
+      }
+    ],
+    "geo": {
+      "state": "FL",
+      "zipcode": "32304"
+    }
+  }
+}
+ GET /api/mpg?year=2026&make=Honda&model=accord 200 in 263ms
+[insurance] Bankrate response keys: [ '0', '1', '2', '3' ]
+[insurance] Bankrate response (truncated): [{"carrier":"Allstate","low":3623,"high":4347.599999999999,"available":true,"brScore":3.9,"jdScore":"691/1000","logo":"https://cdn.insurance.redventures.io/images/allstate.svg","url":"/insurance/reviews/allstate/","expertTake":"Allstate's multiple savings opportunities and high J.D. Power claims satisfaction score may make it an attractive choice for drivers who want affordable, reliable coverage. Additional coverage options are limited, but the carrier does offer rental reimbursement.","pros":["Multiple reward options, such as Deductible Rewards and Drivewise, for driving safely, though availability may vary by state laws","Strong mobile and online tools for easy claims and policy support","Driving training program available tailored for teens to reduce accident risk"],"cons":["Scored below average in a majority of regions based on J.D. Power’s 2022 U.S. Auto Insurance Study","Few additional coverage options","Some policy and coverage options may be limited by state availability"],"de
+[insurance] 4 carriers, 2 available: [ 'Allstate $3623-$4347.599999999999', 'Geico $2476-$2971.2' ]
+ GET /api/insurance?age=35&sex=Female&state=FL&zipCode=32304&makeSlug=honda&modelSlug=accord&miles=12000 200 in 2891ms
+[insurance] category="large-suv" sample="Buick Enclave 2023" state=FL zip=32304 age=35 sex=Female
+[insurance] Request body: {
+  "args": {
+    "policy": {
+      "pd": "50,000",
+      "med": "None",
+      "term": 12,
+      "umbi": "100/300",
+      "liability": "100/300",
+      "occupancy": "Owner",
+      "residence": "House",
+      "credit_tier": "Good",
+      "e_signature": "Yes",
+      "payment_type": "Installments",
+      "number_drivers": 1,
+      "number_vehicles": 1,
+      "property_market": 100000,
+      "property_policy": "Home",
+      "residence_years": 5,
+      "incident_date_mode": 0,
+      "last_late_pay_time": "No Late Payment",
+      "paperless_discount": "Yes",
+      "naic_current_carrier": 99999,
+      "number_late_payments": 0,
+      "days_advance_purchase": 0,
+      "electronic_fund_transfer": "Yes",
+      "naic_current_carrier_mths": 60
+    },
+    "drivers": [
+      {
+        "age": 35,
+        "sex": "Female",
+        "degree": "Bachelors",
+        "dlapse": 0,
+        "filing": "None",
+        "status": "Single",
+        "ca_license": "24y00m",
+        "occupation": "Employed",
+        "profession": "Other",
+        "us_license": "24y00m",
+        "good_student": "No",
+        "relationship": "Insured",
+        "with_parents": "No",
+        "license_state": "FL",
+        "student_level": "None",
+        "license_status": "Active",
+        "prior_physical": "24y00m",
+        "distant_student": "No",
+        "driver_training": "No",
+        "miles_from_home": 0,
+        "prior_liability": "24y00m",
+        "defensive_driver": "No",
+        "number_incidents": 0,
+        "license_suspended": "No",
+        "continuous_license": "24y00m",
+        "verifiable_license": "24y00m",
+        "prior_carrier_market": 200000,
+        "prior_carrier_months": 60,
+        "prior_liability_type": "Standard",
+        "dprior_liability_limit": "100/300",
+        "driver_occupation_years": 10
+      }
+    ],
+    "vehicles": [
+      {
+        "use": "Work",
+        "vin": "4T1H31AK.N",
+        "coll": "500",
+        "comp": "500",
+        "make": "Buick",
+        "model": "Enclave",
+        "annual": 12000,
+        "parked": "Garage",
+        "rental": "None",
+        "towing": "None",
+        "commute": 10,
+        "zipcode": "32304",
+        "ownership": "Financed",
+        "days_per_week": 5,
+        "model_year_y2k": "2023",
+        "purchase_status": "New"
+      }
+    ],
+    "geo": {
+      "state": "FL",
+      "zipcode": "32304"
+    }
+  }
+}
+ GET /api/mpg?year=2026&make=Lincoln&model=navigator 404 in 302ms
+[insurance] Bankrate response keys: [ '0', '1', '2', '3' ]
+[insurance] Bankrate response (truncated): [{"carrier":"Allstate","low":3623,"high":4347.599999999999,"available":true,"brScore":3.9,"jdScore":"691/1000","logo":"https://cdn.insurance.redventures.io/images/allstate.svg","url":"/insurance/reviews/allstate/","expertTake":"Allstate's multiple savings opportunities and high J.D. Power claims satisfaction score may make it an attractive choice for drivers who want affordable, reliable coverage. Additional coverage options are limited, but the carrier does offer rental reimbursement.","pros":["Multiple reward options, such as Deductible Rewards and Drivewise, for driving safely, though availability may vary by state laws","Strong mobile and online tools for easy claims and policy support","Driving training program available tailored for teens to reduce accident risk"],"cons":["Scored below average in a majority of regions based on J.D. Power’s 2022 U.S. Auto Insurance Study","Few additional coverage options","Some policy and coverage options may be limited by state availability"],"de
+[insurance] 4 carriers, 2 available: [ 'Allstate $3623-$4347.599999999999', 'Geico $2476-$2971.2' ]
+ GET /api/insurance?age=35&sex=Female&state=FL&zipCode=32304&makeSlug=lincoln&modelSlug=navigator&miles=12000 200 in 2841ms
+ ✓ Compiled in 572ms (1467 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/home/isaiah-rohrer/coding-projects/lifetime-auto-ownership-cost/.next/cache/webpack/client-development/2.pack.gz_' -> '/home/isaiah-rohrer/coding-projects/lifetime-auto-ownership-cost/.next/cache/webpack/client-development/2.pack.gz'
+ ✓ Compiled /api/insurance in 245ms (766 modules)
+ ✓ Compiled (769 modules)
+[insurance] category="luxury-suv" sample="Acura RDX 2023" state=FL zip=32304 age=35 sex=Female
+[insurance] Request body: {
+  "args": {
+    "policy": {
+      "pd": "50,000",
+      "med": "None",
+      "term": 12,
+      "umbi": "100/300",
+      "liability": "100/300",
+      "occupancy": "Owner",
+      "residence": "House",
+      "credit_tier": "Good",
+      "e_signature": "Yes",
+      "payment_type": "Installments",
+      "number_drivers": 1,
+      "number_vehicles": 1,
+      "property_market": 100000,
+      "property_policy": "Home",
+      "residence_years": 5,
+      "incident_date_mode": 0,
+      "last_late_pay_time": "No Late Payment",
+      "paperless_discount": "Yes",
+      "naic_current_carrier": 99999,
+      "number_late_payments": 0,
+      "days_advance_purchase": 0,
+      "electronic_fund_transfer": "Yes",
+      "naic_current_carrier_mths": 60
+    },
+    "drivers": [
+      {
+        "age": 35,
+        "sex": "Female",
+        "degree": "Bachelors",
+        "dlapse": 0,
+        "filing": "None",
+        "status": "Single",
+        "ca_license": "24y00m",
+        "occupation": "Employed",
+        "profession": "Other",
+        "us_license": "24y00m",
+        "good_student": "No",
+        "relationship": "Insured",
+        "with_parents": "No",
+        "license_state": "FL",
+        "student_level": "None",
+        "license_status": "Active",
+        "prior_physical": "24y00m",
+        "distant_student": "No",
+        "driver_training": "No",
+        "miles_from_home": 0,
+        "prior_liability": "24y00m",
+        "defensive_driver": "No",
+        "number_incidents": 0,
+        "license_suspended": "No",
+        "continuous_license": "24y00m",
+        "verifiable_license": "24y00m",
+        "prior_carrier_market": 200000,
+        "prior_carrier_months": 60,
+        "prior_liability_type": "Standard",
+        "dprior_liability_limit": "100/300",
+        "driver_occupation_years": 10
+      }
+    ],
+    "vehicles": [
+      {
+        "use": "Work",
+        "vin": "4T1H31AK.N",
+        "coll": "500",
+        "comp": "500",
+        "make": "Acura",
+        "model": "RDX",
+        "annual": 12000,
+        "parked": "Garage",
+        "rental": "None",
+        "towing": "None",
+        "commute": 10,
+        "zipcode": "32304",
+        "ownership": "Financed",
+        "days_per_week": 5,
+        "model_year_y2k": "2023",
+        "purchase_status": "New"
+      }
+    ],
+    "geo": {
+      "state": "FL",
+      "zipcode": "32304"
+    }
+  }
+}
+ GET /api/mpg?year=2026&make=Lincoln&model=Corsair 404 in 727ms
+[insurance] Bankrate response keys: [ '0', '1', '2', '3' ]
+[insurance] Bankrate response (truncated): [{"carrier":"Allstate","low":3623,"high":4347.599999999999,"available":true,"brScore":3.9,"jdScore":"691/1000","logo":"https://cdn.insurance.redventures.io/images/allstate.svg","url":"/insurance/reviews/allstate/","expertTake":"Allstate's multiple savings opportunities and high J.D. Power claims satisfaction score may make it an attractive choice for drivers who want affordable, reliable coverage. Additional coverage options are limited, but the carrier does offer rental reimbursement.","pros":["Multiple reward options, such as Deductible Rewards and Drivewise, for driving safely, though availability may vary by state laws","Strong mobile and online tools for easy claims and policy support","Driving training program available tailored for teens to reduce accident risk"],"cons":["Scored below average in a majority of regions based on J.D. Power’s 2022 U.S. Auto Insurance Study","Few additional coverage options","Some policy and coverage options may be limited by state availability"],"de
+[insurance] 4 carriers, 2 available: [ 'Allstate $3623-$4347.599999999999', 'Geico $2476-$2971.2' ]
+ GET /api/insurance?age=35&sex=Female&state=FL&zipCode=32304&makeSlug=lincoln&modelSlug=corsair&miles=12000 200 in 3336ms
+[insurance] category="luxury-suv" sample="Acura RDX 2023" state=FL zip=32304 age=35 sex=Male
+[insurance] Request body: {
+  "args": {
+    "policy": {
+      "pd": "50,000",
+      "med": "None",
+      "term": 12,
+      "umbi": "100/300",
+      "liability": "100/300",
+      "occupancy": "Owner",
+      "residence": "House",
+      "credit_tier": "Good",
+      "e_signature": "Yes",
+      "payment_type": "Installments",
+      "number_drivers": 1,
+      "number_vehicles": 1,
+      "property_market": 100000,
+      "property_policy": "Home",
+      "residence_years": 5,
+      "incident_date_mode": 0,
+      "last_late_pay_time": "No Late Payment",
+      "paperless_discount": "Yes",
+      "naic_current_carrier": 99999,
+      "number_late_payments": 0,
+      "days_advance_purchase": 0,
+      "electronic_fund_transfer": "Yes",
+      "naic_current_carrier_mths": 60
+    },
+    "drivers": [
+      {
+        "age": 35,
+        "sex": "Male",
+        "degree": "Bachelors",
+        "dlapse": 0,
+        "filing": "None",
+        "status": "Single",
+        "ca_license": "24y00m",
+        "occupation": "Employed",
+        "profession": "Other",
+        "us_license": "24y00m",
+        "good_student": "No",
+        "relationship": "Insured",
+        "with_parents": "No",
+        "license_state": "FL",
+        "student_level": "None",
+        "license_status": "Active",
+        "prior_physical": "24y00m",
+        "distant_student": "No",
+        "driver_training": "No",
+        "miles_from_home": 0,
+        "prior_liability": "24y00m",
+        "defensive_driver": "No",
+        "number_incidents": 0,
+        "license_suspended": "No",
+        "continuous_license": "24y00m",
+        "verifiable_license": "24y00m",
+        "prior_carrier_market": 200000,
+        "prior_carrier_months": 60,
+        "prior_liability_type": "Standard",
+        "dprior_liability_limit": "100/300",
+        "driver_occupation_years": 10
+      }
+    ],
+    "vehicles": [
+      {
+        "use": "Work",
+        "vin": "4T1H31AK.N",
+        "coll": "500",
+        "comp": "500",
+        "make": "Acura",
+        "model": "RDX",
+        "annual": 12000,
+        "parked": "Garage",
+        "rental": "None",
+        "towing": "None",
+        "commute": 10,
+        "zipcode": "32304",
+        "ownership": "Financed",
+        "days_per_week": 5,
+        "model_year_y2k": "2023",
+        "purchase_status": "New"
+      }
+    ],
+    "geo": {
+      "state": "FL",
+      "zipcode": "32304"
+    }
+  }
+}
+[insurance] Bankrate response keys: [ '0', '1', '2', '3' ]
+[insurance] Bankrate response (truncated): [{"carrier":"Allstate","low":3610,"high":4332,"available":true,"brScore":3.9,"jdScore":"691/1000","logo":"https://cdn.insurance.redventures.io/images/allstate.svg","url":"/insurance/reviews/allstate/","expertTake":"Allstate's multiple savings opportunities and high J.D. Power claims satisfaction score may make it an attractive choice for drivers who want affordable, reliable coverage. Additional coverage options are limited, but the carrier does offer rental reimbursement.","pros":["Multiple reward options, such as Deductible Rewards and Drivewise, for driving safely, though availability may vary by state laws","Strong mobile and online tools for easy claims and policy support","Driving training program available tailored for teens to reduce accident risk"],"cons":["Scored below average in a majority of regions based on J.D. Power’s 2022 U.S. Auto Insurance Study","Few additional coverage options","Some policy and coverage options may be limited by state availability"],"details":"Allst
+[insurance] 4 carriers, 2 available: [ 'Allstate $3610-$4332', 'Geico $2368-$2841.6' ]
+ GET /api/insurance?age=35&sex=Male&state=FL&zipCode=32304&makeSlug=lincoln&modelSlug=corsair&miles=12000 200 in 2684ms
+[insurance] category="sports" sample="Chevrolet Corvette Stingray 2023" state=FL zip=32304 age=35 sex=Male
+[insurance] Request body: {
+  "args": {
+    "policy": {
+      "pd": "50,000",
+      "med": "None",
+      "term": 12,
+      "umbi": "100/300",
+      "liability": "100/300",
+      "occupancy": "Owner",
+      "residence": "House",
+      "credit_tier": "Good",
+      "e_signature": "Yes",
+      "payment_type": "Installments",
+      "number_drivers": 1,
+      "number_vehicles": 1,
+      "property_market": 100000,
+      "property_policy": "Home",
+      "residence_years": 5,
+      "incident_date_mode": 0,
+      "last_late_pay_time": "No Late Payment",
+      "paperless_discount": "Yes",
+      "naic_current_carrier": 99999,
+      "number_late_payments": 0,
+      "days_advance_purchase": 0,
+      "electronic_fund_transfer": "Yes",
+      "naic_current_carrier_mths": 60
+    },
+    "drivers": [
+      {
+        "age": 35,
+        "sex": "Male",
+        "degree": "Bachelors",
+        "dlapse": 0,
+        "filing": "None",
+        "status": "Single",
+        "ca_license": "24y00m",
+        "occupation": "Employed",
+        "profession": "Other",
+        "us_license": "24y00m",
+        "good_student": "No",
+        "relationship": "Insured",
+        "with_parents": "No",
+        "license_state": "FL",
+        "student_level": "None",
+        "license_status": "Active",
+        "prior_physical": "24y00m",
+        "distant_student": "No",
+        "driver_training": "No",
+        "miles_from_home": 0,
+        "prior_liability": "24y00m",
+        "defensive_driver": "No",
+        "number_incidents": 0,
+        "license_suspended": "No",
+        "continuous_license": "24y00m",
+        "verifiable_license": "24y00m",
+        "prior_carrier_market": 200000,
+        "prior_carrier_months": 60,
+        "prior_liability_type": "Standard",
+        "dprior_liability_limit": "100/300",
+        "driver_occupation_years": 10
+      }
+    ],
+    "vehicles": [
+      {
+        "use": "Work",
+        "vin": "4T1H31AK.N",
+        "coll": "500",
+        "comp": "500",
+        "make": "Chevrolet",
+        "model": "Corvette Stingray",
+        "annual": 12000,
+        "parked": "Garage",
+        "rental": "None",
+        "towing": "None",
+        "commute": 10,
+        "zipcode": "32304",
+        "ownership": "Financed",
+        "days_per_week": 5,
+        "model_year_y2k": "2023",
+        "purchase_status": "New"
+      }
+    ],
+    "geo": {
+      "state": "FL",
+      "zipcode": "32304"
+    }
+  }
+}
+ GET /api/mpg?year=2026&make=Chevrolet&model=Corvette 200 in 377ms
+[insurance] Bankrate response keys: [ '0', '1', '2', '3' ]
+[insurance] Bankrate response (truncated): [{"carrier":"Allstate","low":3610,"high":4332,"available":true,"brScore":3.9,"jdScore":"691/1000","logo":"https://cdn.insurance.redventures.io/images/allstate.svg","url":"/insurance/reviews/allstate/","expertTake":"Allstate's multiple savings opportunities and high J.D. Power claims satisfaction score may make it an attractive choice for drivers who want affordable, reliable coverage. Additional coverage options are limited, but the carrier does offer rental reimbursement.","pros":["Multiple reward options, such as Deductible Rewards and Drivewise, for driving safely, though availability may vary by state laws","Strong mobile and online tools for easy claims and policy support","Driving training program available tailored for teens to reduce accident risk"],"cons":["Scored below average in a majority of regions based on J.D. Power’s 2022 U.S. Auto Insurance Study","Few additional coverage options","Some policy and coverage options may be limited by state availability"],"details":"Allst
+[insurance] 4 carriers, 2 available: [ 'Allstate $3610-$4332', 'Geico $2368-$2841.6' ]
+ GET /api/insurance?age=35&sex=Male&state=FL&zipCode=32304&makeSlug=chevrolet&modelSlug=corvette&miles=12000 200 in 2953ms
