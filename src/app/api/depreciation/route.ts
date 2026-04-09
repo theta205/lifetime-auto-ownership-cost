@@ -11,9 +11,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "make, model, price, miles required" }, { status: 400 });
   }
 
+  // CarEdge URL slug overrides: keyed as "make|model" using our slugs.
+  // Add entries where CarEdge's URL slug differs from our model slug.
+  const URL_OVERRIDES: Record<string, { make: string; model: string }> = {
+    "kia|carnival": { make: "kia", model: "carnival-mpv" },
+  };
+
+  const overrideKey = `${make}|${model}`;
+  const override = URL_OVERRIDES[overrideKey];
+
   // CarEdge slugs use hyphens; our slugs may have spaces
-  const makeSlug  = make.replace(/\s+/g, "-");
-  const modelSlug = model.replace(/\s+/g, "-");
+  const makeSlug  = override?.make  ?? make.replace(/\s+/g, "-");
+  const modelSlug = override?.model ?? model.replace(/\s+/g, "-");
 
   // The JS variable name uses underscores for both spaces and hyphens
   const varSuffix = `${make}_${model}`.replace(/[-\s]+/g, "_").toLowerCase();
@@ -38,12 +47,20 @@ export async function GET(req: NextRequest) {
     const html = await res.text();
     console.log(`[depreciation] fetched ${html.length} bytes, searching for var data_${varSuffix}`);
 
-    // Extract: var data_acura_integra = [{date:'0',price:1,...}, ...];
-    const varRegex = new RegExp(`var\\s+data_${varSuffix}\\s*=\\s*(\\[.*?\\]);`, "s");
-    const match = html.match(varRegex);
+    // Try exact slug match first, then fall back to any var data_{make}_*{model}* on the page.
+    // CarEdge sometimes appends body-style suffixes (e.g. data_kia_carnival_mpv).
+    let varRegex = new RegExp(`var\\s+data_${varSuffix}\\s*=\\s*(\\[.*?\\]);`, "s");
+    let match = html.match(varRegex);
 
     if (!match) {
-      console.error(`[depreciation] variable "data_${varSuffix}" not found in page HTML`);
+      const makePrefix = make.replace(/[-\s]+/g, "_").toLowerCase();
+      const modelCore  = model.replace(/[-\s]+/g, "_").toLowerCase();
+      const fallbackRegex = new RegExp(`var\\s+data_${makePrefix}_${modelCore}\\w*\\s*=\\s*(\\[.*?\\]);`, "s");
+      match = html.match(fallbackRegex);
+    }
+
+    if (!match) {
+      console.error(`[depreciation] variable "data_${varSuffix}" (and fallback) not found in page HTML`);
       return NextResponse.json({ error: "Depreciation data not found on page" }, { status: 404 });
     }
     console.log(`[depreciation] found variable, raw length=${match[1].length}`);

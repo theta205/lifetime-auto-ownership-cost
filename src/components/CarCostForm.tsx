@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { CarInputs } from "@/types/calculator";
 import { InputField } from "./InputField";
 import { VehicleSelector } from "./VehicleSelector";
@@ -8,15 +9,10 @@ import { MAKE_MAINTENANCE, DEFAULT_MAINTENANCE } from "@/lib/maintenanceCosts";
 
 interface CarCostFormProps {
   inputs: CarInputs;
-  onChange: (inputs: CarInputs) => void;
+  onChange: React.Dispatch<React.SetStateAction<CarInputs>>;
   insuranceStatus: "idle" | "loading" | "fetched" | "error";
 }
 
-const DEPRECIATION_OPTIONS = [
-  { value: "slow",     label: "Slow (luxury/trucks)" },
-  { value: "standard", label: "Standard (average car)" },
-  { value: "fast",     label: "Fast (economy/high-mileage)" },
-];
 
 const SEX_OPTIONS = [
   { value: "Male",   label: "Male" },
@@ -25,12 +21,11 @@ const SEX_OPTIONS = [
 
 export function CarCostForm({ inputs, onChange, insuranceStatus }: CarCostFormProps) {
   const handle = (name: string, value: number | string) => {
-    onChange({ ...inputs, [name]: value });
+    onChange((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleState = (state: string) => {
-    const taxRate = STATE_TAX_RATES[state] ?? inputs.salesTaxRate;
-    onChange({ ...inputs, state, salesTaxRate: taxRate });
+    onChange((prev) => ({ ...prev, state, salesTaxRate: STATE_TAX_RATES[state] ?? prev.salesTaxRate }));
   };
 
   return (
@@ -42,10 +37,14 @@ export function CarCostForm({ inputs, onChange, insuranceStatus }: CarCostFormPr
           make={inputs.make}
           model={inputs.model}
           year={inputs.year}
-          onMakeChange={(make) => onChange({ ...inputs, make, model: "", baseMaintenance: MAKE_MAINTENANCE[make] ?? DEFAULT_MAINTENANCE })}
-          onModelChange={(model) => onChange({ ...inputs, model })}
-          onYearChange={(year) => onChange({ ...inputs, year })}
-          onMpgFetched={(mpg) => onChange({ ...inputs, fuelMpg: mpg })}
+          onMakeChange={(make) => {
+            const m = MAKE_MAINTENANCE[make] ?? DEFAULT_MAINTENANCE;
+            onChange((prev) => ({ ...prev, make, model: "", maintenanceCost1to5: m.y1to5, maintenanceCost6to10: m.y6to10 }));
+          }}
+          onModelChange={(model) => onChange((prev) => ({ ...prev, model }))}
+          onYearChange={(year) => onChange((prev) => ({ ...prev, year }))}
+          onMpgFetched={(mpg) => onChange((prev) => ({ ...prev, fuelMpg: mpg }))}
+          onFuelPriceFetched={(price) => onChange((prev) => ({ ...prev, fuelPricePerGallon: price }))}
         />
       </section>
 
@@ -96,11 +95,11 @@ export function CarCostForm({ inputs, onChange, insuranceStatus }: CarCostFormPr
             {insuranceStatus === "loading" && (
               <span className="flex items-center gap-2">
                 <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-                Fetching insurance rates from Bankrate...
+                Fetching insurance rates...
               </span>
             )}
             {insuranceStatus === "error"   && "Could not fetch rates — using your manual input"}
-            {insuranceStatus === "fetched" && "Insurance premium updated from Bankrate rate table"}
+            {insuranceStatus === "fetched" && "Insurance premium updated"}
           </div>
         )}
       </section>
@@ -109,29 +108,60 @@ export function CarCostForm({ inputs, onChange, insuranceStatus }: CarCostFormPr
       <section>
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">Purchase</h3>
         <div className="grid grid-cols-2 gap-3">
-          <InputField label="Purchase Price"    name="purchasePrice"   value={inputs.purchasePrice}   onChange={handle} prefix="$" min={0} step={500} />
-          <InputField label="Down Payment"      name="downPayment"     value={inputs.downPayment}     onChange={handle} prefix="$" min={0} step={500} />
-          <InputField label="Sales Tax Rate"    name="salesTaxRate"    value={inputs.salesTaxRate}    onChange={handle} suffix="%" min={0} max={15} step={0.1} />
-          <InputField label="Registration/Fees" name="registrationFees" value={inputs.registrationFees} onChange={handle} prefix="$" min={0} step={50} />
+          <InputField label="Purchase Price" name="purchasePrice" value={inputs.purchasePrice} onChange={handle} prefix="$" min={0} step={500} />
+          {!(inputs.downPayment >= inputs.purchasePrice && inputs.purchasePrice > 0) && (
+            <InputField label="Down Payment" name="downPayment" value={inputs.downPayment} onChange={handle} prefix="$" min={0} step={500} />
+          )}
         </div>
       </section>
 
       {/* Loan */}
       <section>
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">Financing</h3>
-        <div className="grid grid-cols-2 gap-3">
-          <InputField label="Interest Rate (APR)" name="loanInterestRate" value={inputs.loanInterestRate} onChange={handle} suffix="%" min={0} max={30} step={0.1} />
-          <InputField label="Loan Term"            name="loanTermMonths"  value={inputs.loanTermMonths}  onChange={handle} suffix="mo" min={12} max={96} step={12} />
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Financing</h3>
+          <button
+            type="button"
+            onClick={() => {
+              const isCash = inputs.downPayment >= inputs.purchasePrice && inputs.purchasePrice > 0;
+              onChange((prev) => isCash
+                ? { ...prev, downPayment: 0, loanInterestRate: 6.5, loanTermMonths: 60 }
+                : { ...prev, downPayment: prev.purchasePrice, loanInterestRate: 0, loanTermMonths: 12 }
+              );
+            }}
+            className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
+              inputs.downPayment >= inputs.purchasePrice && inputs.purchasePrice > 0
+                ? "bg-green-100 text-green-700"
+                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+            }`}
+          >
+            {inputs.downPayment >= inputs.purchasePrice && inputs.purchasePrice > 0 ? "Cash ✓" : "Pay cash"}
+          </button>
         </div>
+        {!(inputs.downPayment >= inputs.purchasePrice && inputs.purchasePrice > 0) && (
+          <div className="grid grid-cols-2 gap-3">
+            <InputField label="Interest Rate (APR)" name="loanInterestRate" value={inputs.loanInterestRate} onChange={handle} suffix="%" min={0} max={30} step={0.1} />
+            <InputField label="Loan Term (months)" name="loanTermMonths" value={inputs.loanTermMonths} onChange={handle} suffix="mo" min={12} max={96} step={12} />
+          </div>
+        )}
       </section>
 
       {/* Fuel */}
       <section>
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">Fuel</h3>
         <div className="grid grid-cols-2 gap-3">
-          <InputField label="Fuel Economy"  name="fuelMpg"            value={inputs.fuelMpg}            onChange={handle} suffix="mpg" min={1} max={200} step={1} />
-          <InputField label="Miles Per Year" name="milesPerYear"       value={inputs.milesPerYear}       onChange={handle} suffix="mi" min={1000} max={100000} step={500} />
-          <InputField label="Gas Price"      name="fuelPricePerGallon" value={inputs.fuelPricePerGallon} onChange={handle} prefix="$" suffix="/gal" min={0} step={0.05} />
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700">Annual Miles</label>
+            <select
+              value={inputs.milesPerYear}
+              onChange={(e) => handle("milesPerYear", parseInt(e.target.value))}
+              className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              {[6000,7500,9000,10500,12000,13500,15000,16500,18000,19500,21000].map((m) => (
+                <option key={m} value={m}>{m.toLocaleString()}</option>
+              ))}
+            </select>
+          </div>
+          <InputField label="Fuel Price" name="fuelPricePerGallon" value={inputs.fuelPricePerGallon} onChange={handle} prefix="$" suffix="/gal" min={0} step={0.05} />
         </div>
       </section>
 
@@ -144,20 +174,20 @@ export function CarCostForm({ inputs, onChange, insuranceStatus }: CarCostFormPr
       </section>
 
       {/* Depreciation */}
-      <section>
+      {/* <section>
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">Depreciation</h3>
         <div className="grid grid-cols-2 gap-3">
           <InputField label="Depreciation Model" name="depreciationModel" value={inputs.depreciationModel} onChange={handle} type="select" options={DEPRECIATION_OPTIONS} />
         </div>
-      </section>
+      </section> */}
 
       {/* Horizon */}
-      <section>
+      {/* <section>
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">Ownership Horizon</h3>
         <div className="grid grid-cols-2 gap-3">
           <InputField label="Years to Own" name="ownershipYears" value={inputs.ownershipYears} onChange={handle} suffix="yr" min={1} max={20} step={1} />
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

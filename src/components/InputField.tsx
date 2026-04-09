@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 interface InputFieldProps {
   label: string;
   name: string;
@@ -27,10 +29,18 @@ export function InputField({
   suffix,
   options,
 }: InputFieldProps) {
+  const [display, setDisplay] = useState(String(value));
+  const [focused, setFocused] = useState(false);
+
+  // Sync display when external value changes (e.g. EPA fetch), but not while user is typing
+  useEffect(() => {
+    if (!focused) setDisplay(String(value));
+  }, [value, focused]);
+
   return (
     <div className="flex flex-col gap-1">
       <label className="text-sm font-medium text-gray-700">{label}</label>
-      <div className="flex items-center rounded-md border border-gray-300 bg-white shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
+      <div className="relative flex items-center rounded-md border border-gray-300 bg-white shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
         {prefix && (
           <span className="pl-3 text-sm text-gray-500 select-none">{prefix}</span>
         )}
@@ -49,18 +59,32 @@ export function InputField({
           </select>
         ) : (
           <input
-            type="number"
+            type="text"
+            inputMode="decimal"
             name={name}
-            value={value as number}
+            value={display}
             min={min}
             max={max}
             step={step}
-            onChange={(e) => onChange(name, parseFloat(e.target.value) || 0)}
-            className="flex-1 bg-transparent py-2 pl-2 pr-3 text-sm text-gray-900 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            onFocus={() => setFocused(true)}
+            onBlur={() => {
+              setFocused(false);
+              const n = parseFloat(display);
+              const safe = isNaN(n) ? (min ?? 0) : n;
+              setDisplay(String(safe));
+              onChange(name, safe);
+            }}
+            onChange={(e) => {
+              const raw = e.target.value;
+              setDisplay(raw);
+              const n = parseFloat(raw);
+              if (!isNaN(n)) onChange(name, n);
+            }}
+            className={`flex-1 bg-transparent py-2 pl-2 text-sm text-gray-900 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${suffix ? "pr-8" : "pr-3"}`}
           />
         )}
         {suffix && (
-          <span className="pr-3 text-sm text-gray-500 select-none">{suffix}</span>
+          <span className="absolute right-2 text-xs text-gray-400 select-none pointer-events-none">{suffix}</span>
         )}
       </div>
     </div>

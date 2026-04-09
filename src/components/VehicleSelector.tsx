@@ -11,6 +11,7 @@ interface VehicleSelectorProps {
   onModelChange: (model: string) => void;
   onYearChange: (year: number) => void;
   onMpgFetched: (mpg: number) => void;
+  onFuelPriceFetched: (price: number) => void;
 }
 
 interface MpgResult {
@@ -18,6 +19,7 @@ interface MpgResult {
   city: number | null;
   highway: number | null;
   fuelType: string;
+  fuelPrice: number | null;
   trims: string[];
 }
 
@@ -29,10 +31,10 @@ export function VehicleSelector({
   onModelChange,
   onYearChange,
   onMpgFetched,
+  onFuelPriceFetched,
 }: VehicleSelectorProps) {
   const [mpg, setMpg] = useState<MpgResult | null>(null);
   const [mpgLoading, setMpgLoading] = useState(false);
-  const [mpgError, setMpgError] = useState<string | null>(null);
 
   const selectedMake = MAKE_MAP.get(make);
   const models = selectedMake?.models ?? [];
@@ -45,7 +47,6 @@ export function VehicleSelector({
     }
     const controller = new AbortController();
     setMpgLoading(true);
-    setMpgError(null);
 
     const modelDisplay = selectedMake?.models.find((m) => m.slug === model)?.displayName ?? model;
     const params = new URLSearchParams({ year: String(year), make: selectedMake?.displayName ?? make, model: modelDisplay });
@@ -53,15 +54,16 @@ export function VehicleSelector({
       .then((r) => r.json())
       .then((data: MpgResult & { error?: string }) => {
         if (data.error) {
-          setMpgError("Not found in EPA database");
           setMpg(null);
+          onMpgFetched(25);
         } else {
           setMpg(data);
-          if (data.combined) onMpgFetched(data.combined);
+          onMpgFetched(data.combined ?? 25);
+          if (data.fuelPrice) onFuelPriceFetched(data.fuelPrice);
         }
       })
       .catch((err) => {
-        if (err.name !== "AbortError") setMpgError("Could not fetch MPG");
+        if (err.name !== "AbortError") onMpgFetched(25);
       })
       .finally(() => setMpgLoading(false));
 
@@ -118,24 +120,18 @@ export function VehicleSelector({
       </div>
 
       {/* MPG feedback */}
-      {(mpgLoading || mpg || mpgError) && (
-        <div className={`rounded-lg px-3 py-2 text-xs ${
-          mpgLoading ? "bg-blue-50 text-blue-700" :
-          mpgError ? "bg-amber-50 text-amber-700" :
-          "bg-green-50 text-green-700"
-        }`}>
+      {(mpgLoading || mpg) && (
+        <div className={`rounded-lg px-3 py-2 text-xs ${mpgLoading ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"}`}>
           {mpgLoading && (
             <span className="flex items-center gap-2">
               <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
               Fetching EPA fuel economy...
             </span>
           )}
-          {mpgError && <span>{mpgError} — MPG set to your input</span>}
           {mpg && !mpgLoading && (
             <div>
               <span className="font-semibold">EPA: {mpg.combined} mpg combined</span>
-              <span className="ml-2 text-green-600">({mpg.city} city / {mpg.highway} hwy)</span>
-              {mpg.fuelType && <span className="ml-2 text-gray-500">· {mpg.fuelType}</span>}
+              {mpg.fuelType && <span className="ml-2">· {mpg.fuelType}</span>}
             </div>
           )}
         </div>

@@ -21,14 +21,23 @@ function Card({ label, value, sub, color }: { label: string; value: string; sub?
 
 export function SummaryCards({ result }: SummaryCardsProps) {
   const { summary } = result;
+  const firstYearTotal = result.years[0]?.totalThisYear ?? 0;
+  const incomeNeeded = firstYearTotal / 0.15;
+
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       <Card label="Total Spent" value={fmt(summary.grandTotal)} sub={`incl. down payment: ${fmt(summary.grandTotal + summary.totalPrincipal - (summary.totalPrincipal))}`} />
       <Card label="Net Cost" value={fmt(summary.netTotalCost)} sub="after resale value" color="text-red-600" />
       <Card label="Residual Value" value={fmt(summary.finalVehicleValue)} sub="estimated resale" color="text-green-600" />
-      <Card label="Monthly Payment" value={fmt(summary.monthlyPayment)} sub={`${result.years[0]?.year ?? 0} of ${Math.ceil(result.years.length)}-yr term`} />
+      <Card label="Monthly Payment" value={fmt(summary.monthlyPayment)} />
       <Card label="Total Interest" value={fmt(summary.totalInterest)} sub="financing cost" color="text-amber-600" />
-      <Card label="Total Fuel" value={fmt(summary.totalFuel)} sub="over ownership period" />
+      {/* <Card label="Total Fuel" value={fmt(summary.totalFuel)} sub="over ownership period" /> */}
+      <Card
+        label="Income Needed"
+        value={fmt(incomeNeeded)}
+        sub={`${fmt(firstYearTotal)} yr-1 total · 15% rule`}
+        color="text-blue-600"
+      />
     </div>
   );
 }

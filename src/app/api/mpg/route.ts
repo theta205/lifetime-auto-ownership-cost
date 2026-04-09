@@ -137,11 +137,43 @@ export async function GET(req: NextRequest) {
     const fuelType = xmlVal(vXml, "fuelType1");
     const trims    = xmlVals(optXml, "text");
 
+    // Fetch current fuel prices from EPA and pick the right one for this vehicle
+    let fuelPrice: number | null = null;
+    try {
+      const pricesRes = await fetch(`${BASE}/fuelprices`, { next: { revalidate: 3600 } });
+      if (pricesRes.ok) {
+        const pricesXml = await pricesRes.text();
+        const fuelLower = fuelType.toLowerCase();
+        if (fuelLower.includes("electric")) {
+          fuelPrice = parseFloat(xmlVal(pricesXml, "electric"));
+        } else if (fuelLower.includes("diesel")) {
+          fuelPrice = parseFloat(xmlVal(pricesXml, "diesel"));
+        } else if (fuelLower.includes("premium")) {
+          fuelPrice = parseFloat(xmlVal(pricesXml, "premium"));
+        } else if (fuelLower.includes("midgrade")) {
+          fuelPrice = parseFloat(xmlVal(pricesXml, "midgrade"));
+        } else if (fuelLower.includes("e85")) {
+          fuelPrice = parseFloat(xmlVal(pricesXml, "e85"));
+        } else if (fuelLower.includes("cng")) {
+          fuelPrice = parseFloat(xmlVal(pricesXml, "cng"));
+        } else if (fuelLower.includes("lpg") || fuelLower.includes("propane")) {
+          fuelPrice = parseFloat(xmlVal(pricesXml, "lpg"));
+        } else {
+          // Default: regular gasoline
+          fuelPrice = parseFloat(xmlVal(pricesXml, "regular"));
+        }
+        if (isNaN(fuelPrice as number)) fuelPrice = null;
+      }
+    } catch {
+      // Non-fatal — fuel price stays null
+    }
+
     return NextResponse.json({
-      combined: isNaN(combined) ? null : combined,
-      city:     isNaN(city)     ? null : city,
-      highway:  isNaN(highway)  ? null : highway,
+      combined:  isNaN(combined) ? null : combined,
+      city:      isNaN(city)     ? null : city,
+      highway:   isNaN(highway)  ? null : highway,
       fuelType,
+      fuelPrice,
       trims,
       vehicleId: ids[0],
     });

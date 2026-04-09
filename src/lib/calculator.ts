@@ -8,14 +8,11 @@ const DEPRECIATION_RATES: Record<string, number[]> = {
   slow:     [0.15, 0.12, 0.10, 0.09, 0.08, 0.07, 0.07, 0.06, 0.06, 0.05],
 };
 
-/** Maintenance cost multiplier by age (relative to baseMaintenance) */
-function maintenanceMultiplier(year: number): number {
-  if (year <= 2) return 0.5;
-  if (year <= 4) return 0.8;
-  if (year <= 6) return 1.0;
-  if (year <= 8) return 1.4;
-  if (year <= 10) return 1.8;
-  return 2.4;
+/** Annual maintenance cost for a given ownership year */
+function maintenanceCostForYear(y1to5: number, y6to10: number, year: number): number {
+  if (year <= 5) return y1to5;
+  if (year <= 10) return y6to10;
+  return y6to10 * 1.3; // extrapolate 11+ years
 }
 
 function depreciationRateForYear(model: CarInputs["depreciationModel"], year: number): number {
@@ -76,9 +73,14 @@ export function calculate(inputs: CarInputs): CalculationResult {
     annualInsurancePremium,
     depreciationModel,
     depreciation,
-    baseMaintenance,
+    maintenanceCost1to5,
+    maintenanceCost6to10,
     ownershipYears,
+    year: modelYear,
   } = inputs;
+
+  // Vehicle age at the time of purchase (0 for brand-new cars)
+  const vehicleAgeAtPurchase = Math.max(0, new Date().getFullYear() - modelYear);
 
   const safePurchasePrice = Math.max(0, purchasePrice);
   const safeDownPayment = Math.min(Math.max(0, downPayment), safePurchasePrice);
@@ -90,10 +92,9 @@ export function calculate(inputs: CarInputs): CalculationResult {
 
   const years: YearlyCost[] = [];
   let vehicleValue = safePurchasePrice;
-  let cumulativeTotal = 0;
-
-  // Year 0 up-front costs: down payment + tax + fees (not included in yearly loop)
-  const upfrontCosts = safeDownPayment + salesTaxAmount + registrationFees;
+  // Down payment is a year-0 cash outflow; seed cumulativeTotal with it so all
+  // per-year and summary totals reflect the true amount spent.
+  let cumulativeTotal = safeDownPayment;
 
   for (let year = 1; year <= ownershipYears; year++) {
     // Depreciation: use CarEdge residual fractions for years 1–10 when available,
@@ -106,7 +107,7 @@ export function calculate(inputs: CarInputs): CalculationResult {
     }
 
     // Loan
-    const { principal, interest } = loanPaymentsForYear(loanAmount, loanInterestRate, loanTermMonths, year);
+    const { principal, interest, remainingBalance: loanBalance } = loanPaymentsForYear(loanAmount, loanInterestRate, loanTermMonths, year);
 
     // First year: tax and registration are already paid upfront, so don't double-count
     const taxThisYear = year === 1 ? salesTaxAmount : 0;
@@ -114,13 +115,15 @@ export function calculate(inputs: CarInputs): CalculationResult {
 
     const fuel = annualFuel;
     const insurance = annualInsurancePremium;
-    const maintenance = baseMaintenance * maintenanceMultiplier(year);
+    // Use vehicle age (not ownership year) to pick the correct maintenance bucket
+    const vehicleAge = vehicleAgeAtPurchase + year;
+    const maintenance = maintenanceCostForYear(maintenanceCost1to5, maintenanceCost6to10, vehicleAge);
 
     const totalThisYear = principal + interest + taxThisYear + registrationThisYear + fuel + insurance + maintenance;
     cumulativeTotal += totalThisYear;
 
-    // Net cost = cumulative total + down payment - current residual value
-    const netCost = cumulativeTotal + safeDownPayment - vehicleValue;
+    // Net cost = cumulative total (already includes down payment) - current residual value
+    const netCost = cumulativeTotal - vehicleValue;
 
     years.push({
       year,
@@ -134,6 +137,7 @@ export function calculate(inputs: CarInputs): CalculationResult {
       totalThisYear,
       cumulativeTotal,
       vehicleValue,
+      loanBalance,
       netCost,
     });
   }
@@ -153,7 +157,7 @@ export function calculate(inputs: CarInputs): CalculationResult {
   return {
     years,
     summary: {
-      totalPrincipal: totals.principal + safeDownPayment,
+      totalPrincipal: totals.principal + safeDownPayment, // loan repayment + down payment = full purchase price
       totalInterest: totals.interest,
       totalTaxAndFees: totals.taxAndFees,
       totalFuel: totals.fuel,
@@ -176,17 +180,18 @@ export const DEFAULT_INPUTS: CarInputs = {
   zipCode: "",
   driverAge: 35,
   driverSex: "Male",
-  purchasePrice: 30000,
-  downPayment: 5000,
-  salesTaxRate: 7.5,
-  registrationFees: 300,
+  purchasePrice: 0,
+  downPayment: 0,
+  salesTaxRate: 0,
+  registrationFees: 0,
   loanInterestRate: 6.5,
   loanTermMonths: 60,
   fuelMpg: 30,
-  milesPerYear: 12000,
+  milesPerYear: 13500,
   fuelPricePerGallon: 3.5,
   annualInsurancePremium: 1800,
   depreciationModel: "standard",
-  baseMaintenance: 600,
+  maintenanceCost1to5: 290,
+  maintenanceCost6to10: 1250,
   ownershipYears: 10,
 };

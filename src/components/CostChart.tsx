@@ -18,6 +18,7 @@ interface CostChartProps {
   years: YearlyCost[];
   view: "cumulative" | "annual" | "value";
   purchasePrice?: number;
+  downPayment?: number;
 }
 
 const fmt = (v: number) =>
@@ -50,11 +51,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-export function CostChart({ years, view, purchasePrice }: CostChartProps) {
+export function CostChart({ years, view, purchasePrice, downPayment = 0 }: CostChartProps) {
   if (view === "value") {
     const valueData = [
-      { year: 0, vehicleValue: purchasePrice ?? years[0]?.vehicleValue ?? 0, cumulativeTotal: 0, netCost: 0 },
-      ...years,
+      { year: 0, vehicleValue: purchasePrice ?? years[0]?.vehicleValue ?? 0, loanBalance: (purchasePrice ?? 0) - downPayment },
+      ...years.map((y) => ({ year: y.year, vehicleValue: y.vehicleValue, loanBalance: y.loanBalance })),
     ];
     return (
       <ResponsiveContainer width="100%" height={320}>
@@ -65,8 +66,7 @@ export function CostChart({ years, view, purchasePrice }: CostChartProps) {
           <Tooltip content={<CustomTooltip />} />
           <Legend />
           <Line type="monotone" dataKey="vehicleValue" name="Vehicle Value" stroke={COLORS.value} strokeWidth={2} dot={false} />
-          <Line type="monotone" dataKey="cumulativeTotal" name="Cumulative Spent" stroke={COLORS.cumulative} strokeWidth={2} dot={false} />
-          <Line type="monotone" dataKey="netCost" name="Net Cost" stroke={COLORS.netCost} strokeWidth={2} dot={false} strokeDasharray="5 5" />
+          <Line type="monotone" dataKey="loanBalance" name="Loan Balance" stroke={COLORS.netCost} strokeWidth={2} dot={false} strokeDasharray="5 5" />
         </LineChart>
       </ResponsiveContainer>
     );
@@ -74,7 +74,7 @@ export function CostChart({ years, view, purchasePrice }: CostChartProps) {
 
   if (view === "cumulative") {
     const data = [
-      { year: 0, Principal: 0, Interest: 0, "Tax & Fees": 0, Fuel: 0, Insurance: 0, Maintenance: 0 },
+      { year: 0, Principal: downPayment, Interest: 0, "Tax & Fees": 0, Fuel: 0, Insurance: 0, Maintenance: 0 },
       ...years.map((y) => ({
         year: y.year,
         Principal: y.principal,

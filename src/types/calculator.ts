@@ -34,8 +34,9 @@ export interface CarInputs {
   // When present, these override the model-based rates for those years.
   depreciation?: number[];
 
-  // Maintenance (base annual cost; increases with age)
-  baseMaintenance: number;
+  // Maintenance (annual cost by age bucket, from Consumer Reports)
+  maintenanceCost1to5: number;   // avg annual cost for years 1-5
+  maintenanceCost6to10: number;  // avg annual cost for years 6-10
 
   // Ownership horizon
   ownershipYears: number;
@@ -56,6 +57,8 @@ export interface YearlyCost {
 
   // Vehicle residual value at end of year
   vehicleValue: number;
+  // Remaining loan balance at end of year
+  loanBalance: number;
   // Net cost = cumulative total - residual value (what you've "spent" net of resale)
   netCost: number;
 }
